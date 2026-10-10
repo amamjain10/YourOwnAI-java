@@ -20,9 +20,13 @@ A Java-based vector database and Retrieval-Augmented Generation (RAG) engine bui
 
 ## Current Progress
 
+## Project Progress
+
 - [x] Initialize the Maven project.
 - [x] Implement the immutable Vector model.
 - [x] Add vector validation and immutability tests.
+- [x] Implement the in-memory VectorStore.
+- [x] Add unit tests for VectorStore.
 - [ ] Implement distance metrics.
 - [ ] Build nearest-neighbor search.
 - [ ] Integrate local embeddings and RAG.
