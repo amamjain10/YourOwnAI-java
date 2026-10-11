@@ -21,6 +21,20 @@ public final class VectorMetrics {
 
         return Math.sqrt(sum);
     }
+    
+    public static double manhattanDistance(Vector a, Vector b) {
+    validateVectors(a, b);
+
+    double[] valuesA = a.getValues();
+    double[] valuesB = b.getValues();
+    double sum = 0.0;
+
+    for (int i = 0; i < valuesA.length; i++) {
+        sum += Math.abs(valuesA[i] - valuesB[i]);
+    }
+
+    return sum;
+    }
 
     public static double cosineSimilarity(Vector a, Vector b) {
         validateVectors(a, b);

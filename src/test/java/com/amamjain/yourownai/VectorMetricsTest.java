@@ -14,6 +14,16 @@ public class VectorMetricsTest {
         assertEquals(5.0,
             VectorMetrics.euclideanDistance(a, b), 1e-9);
     }
+    
+    @Test
+    public void testManhattanDistance() {
+    Vector a = new Vector("A", new double[]{1, 2});
+    Vector b = new Vector("B", new double[]{4, 6});
+
+    assertEquals(7.0,
+        VectorMetrics.manhattanDistance(a, b), 1e-9);
+    }
+
 
     @Test
     public void testDistanceBetweenIdenticalVectors() {
@@ -67,4 +77,18 @@ public class VectorMetricsTest {
             // Expected result.
         }
     }
+        
+    @Test
+    public void testManhattanDistanceRejectsDifferentDimensions() {
+    Vector a = new Vector("A", new double[]{1, 2});
+    Vector b = new Vector("B", new double[]{1, 2, 3});
+
+    try {
+        VectorMetrics.manhattanDistance(a, b);
+        fail("Expected IllegalArgumentException");
+    } catch (IllegalArgumentException expected) {
+        // Expected result.
+    }
+}
+
 }
