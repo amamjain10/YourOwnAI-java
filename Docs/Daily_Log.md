@@ -193,3 +193,81 @@
 - Load text documents into the application.
 - Split documents into smaller chunks.
 - Prepare the foundation for generating text embeddings and building a retrieval-augmented generation (RAG) pipeline.
+
+## Day 8 — Document Loading and Text Chunking
+
+### Completed
+- Implemented `TextDocumentLoader` to read local text files using UTF-8 encoding.
+- Implemented `TextChunker` to split documents into fixed-size character chunks.
+- Added configurable overlap between consecutive chunks.
+- Added validation for chunk size and overlap.
+- Prepared a sample text document to demonstrate the document-processing workflow.
+- Updated `App.java` to demonstrate document loading and chunking.
+
+### Validation
+- Tests run: 31
+- Failures: 0
+- Errors: 0
+- Skipped: 0
+- Build status: SUCCESS
+
+**Note:** These results are from the Maven test run on October 12, 2026. The output did not list dedicated `TextChunkerTest` or `TextDocumentLoaderTest` classes, so those tests and the document-processing demo still need to be verified separately.
+
+### What I learned
+- How to read local text files using Java NIO.
+- Why large documents are split into smaller chunks for retrieval.
+- How overlapping chunks help preserve context across chunk boundaries.
+- How input validation improves the reliability of text-processing components.
+- How document processing prepares text for embedding generation and semantic retrieval.
+
+### Next Steps
+- Verify document loading and chunking with a real text file.
+- Add and run dedicated unit tests for both components.
+- Generate embeddings for the resulting text chunks.
+- Associate stored vectors with their original text to support retrieval-augmented generation (RAG).
+
+## Day 9 — Embedding Service Foundation
+
+### Completed
+- Introduced the `EmbeddingService` interface for converting text into numerical vectors.
+- Created a mock implementation for predictable unit testing.
+- Added tests for valid text and invalid input.
+- Established an abstraction for integrating a real local embedding model.
+
+### Validation
+- Tests run: Record the actual Maven output.
+- Failures: Record the actual Maven output.
+- Errors: Record the actual Maven output.
+- Build status: Update after running `mvn clean test`.
+
+### What I learned
+- How text embeddings represent text numerically.
+- How embeddings enable semantic search.
+- Why a service interface separates model integration from application logic.
+- Why mock embeddings are useful for testing but cannot represent semantic meaning.
+
+### Next steps
+- Integrate a real local embedding model through Ollama.
+- Generate embeddings for text chunks.
+- Store embeddings alongside their original text.
+- Prepare for semantic document retrieval.
+
+## Day 10 — Local Embedding Integration
+
+**Date:** 13 October 2026
+
+### Work completed ###
+- Integrated the Java application with the local Ollama API using Java's `HttpClient`.
+- Used the `nomic-embed-text` model to generate text embeddings.
+- Used Jackson to parse the JSON response.
+- Successfully generated a 768-dimensional embedding for a sample sentence.
+- Verified that the Java application can communicate with the local Ollama service.
+
+### Validation ###
+- Sample input: `Java is a programming language.`
+- Embedding dimensions returned: 768
+- Ollama API integration: Successful
+
+### Next steps ###
+- Connect generated embeddings to the vector storage and search pipeline.
+- Build the retrieval workflow needed for a basic local RAG system.

@@ -1,0 +1,3 @@
+YourOwnAI is a Java project that explores vector storage and semantic search.
+Text documents can be divided into chunks and converted into embeddings.
+Those embeddings can later be used to retrieve relevant information.
