@@ -1,3 +1,11 @@
-YourOwnAI is a Java project that explores vector storage and semantic search.
-Text documents can be divided into chunks and converted into embeddings.
-Those embeddings can later be used to retrieve relevant information.
+Java is a popular object-oriented programming language used to build web applications, enterprise software, and Android applications. It supports classes, objects, inheritance, encapsulation, and polymorphism.
+
+Python is widely used in artificial intelligence, machine learning, data science, and automation. Its libraries make it useful for data analysis, model training, and scientific computing.
+
+Machine learning enables computers to learn patterns from data. Supervised learning uses labeled examples, while unsupervised learning discovers patterns in unlabeled data. Neural networks are an important part of deep learning.
+
+A vector database stores numerical representations called embeddings. Embeddings represent text as vectors, allowing a system to compare the semantic similarity between a query and stored documents.
+
+Retrieval-Augmented Generation, or RAG, combines information retrieval with a language model. A RAG system retrieves relevant document passages and supplies them as context to a language model, helping it answer questions using the provided information.
+
+Cosine similarity compares the direction of two vectors. It is commonly used to compare text embeddings. A smaller cosine distance indicates greater similarity when distance is calculated as one minus cosine similarity.

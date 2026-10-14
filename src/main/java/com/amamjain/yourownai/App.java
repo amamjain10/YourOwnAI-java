@@ -1,49 +1,66 @@
 
 package com.amamjain.yourownai;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 public class App {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
+        // 1. Load the document
+        TextDocumentLoader loader = new TextDocumentLoader();
+
+        String document = loader.load(Path.of("sample.txt"));
+
+        System.out.println("Document loaded successfully.");
+        System.out.println("Document characters: "
+                + document.length());
+
+        // 2. Split the document into chunks
+        TextChunker chunker = new TextChunker(300, 50);
+        List<String> chunks = chunker.chunkText(document);
+
+        System.out.println("Total chunks: " + chunks.size());
+
+        // 3. Create the embedding and semantic search services
         EmbeddingService embeddingService =
                 new OllamaEmbeddingService();
 
-        SemanticSearchService semanticSearch =
+        SemanticSearchService searchService =
                 new SemanticSearchService(embeddingService);
 
-        semanticSearch.addText(
-                "doc1",
-                "Java is an object-oriented programming language.");
+        // 4. Generate embeddings and index every chunk
+        for (int i = 0; i < chunks.size(); i++) {
+            String id = "chunk-" + (i + 1);
+            searchService.addText(id, chunks.get(i));
+        }
 
-        semanticSearch.addText(
-                "doc2",
-                "Python is widely used for data science and machine learning.");
+        System.out.println("Indexed passages: "
+                + searchService.size());
 
-        semanticSearch.addText(
-                "doc3",
-                "Neural networks learn patterns from training data.");
+        // 5. Search the document
+        String query =
+                "How does RAG use retrieved documents to answer questions?";
 
-        semanticSearch.addText(
-                "doc4",
-                "A database stores and organizes information.");
+        System.out.println("\nQuery: " + query);
+        System.out.println("\nTop search results:");
 
-        String query = "Which language is used for machine learning?";
+        List<SearchResult> results =
+                searchService.search(query, 3);
 
-        System.out.println("Query: " + query);
-        System.out.println("\nSearch results:");
-
-        List<SearchResult> results = semanticSearch.search(query, 3);
-
+        // 6. Display the matching text
         for (SearchResult result : results) {
-            String text = semanticSearch.getText(
-                    result.getVector().getId());
+            String id = result.getVector().getId();
+            String originalText = searchService.getText(id);
 
             System.out.printf(
-                    "ID: %s | Distance: %.4f%nText: %s%n%n",
-                    result.getVector().getId(),
-                    result.getDistance(),
-                    text);
+                    "%nID: %s | Cosine distance: %.4f%n",
+                    id,
+                    result.getDistance());
+
+            System.out.println("Text: " + originalText);
         }
     }
 }
