@@ -2,8 +2,8 @@
 package com.amamjain.yourownai;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class TextChunker {
 
@@ -26,27 +26,106 @@ public class TextChunker {
     }
 
     public List<String> chunkText(String text) {
-        Objects.requireNonNull(text, "Text cannot be null");
-
-        List<String> chunks = new ArrayList<>();
-
-        if (text.isBlank()) {
-            return List.of();
+        if (text == null || text.isBlank()) {
+            return Collections.emptyList();
         }
 
+        List<String> chunks = new ArrayList<>();
         int start = 0;
+        int length = text.length();
 
-        while (start < text.length()) {
-            int end = Math.min(start + chunkSize, text.length());
-            chunks.add(text.substring(start, end));
+        while (start < length) {
+            int end = Math.min(start + chunkSize, length);
 
-            if (end == text.length()) {
+            if (end < length) {
+                int preferredEnd = findSentenceBoundary(
+                        text, start, end);
+
+                if (preferredEnd > start) {
+                    end = preferredEnd;
+                } else {
+                    int whitespace = end;
+
+                    while (whitespace > start
+                            && !Character.isWhitespace(
+                                    text.charAt(whitespace - 1))) {
+                        whitespace--;
+                    }
+
+                    if (whitespace > start) {
+                        end = whitespace;
+                    } else {
+                        // A single word is longer than the chunk size.
+                        // Extend to the next word boundary rather than
+                        // splitting that word.
+                        while (end < length
+                                && !Character.isWhitespace(
+                                        text.charAt(end))) {
+                            end++;
+                        }
+                    }
+                }
+            }
+
+            String chunk = text.substring(start, end).trim();
+
+            if (!chunk.isEmpty()) {
+                chunks.add(chunk);
+            }
+
+            if (end >= length) {
                 break;
             }
 
-            start = end - overlap;
+            int nextStart = Math.max(start + 1, end - overlap);
+
+            // Start the next chunk at a word boundary.
+            while (nextStart < end
+                    && !Character.isWhitespace(
+                            text.charAt(nextStart))) {
+                nextStart++;
+            }
+
+            while (nextStart < length
+                    && Character.isWhitespace(
+                            text.charAt(nextStart))) {
+                nextStart++;
+            }
+
+            if (nextStart <= start || nextStart >= length) {
+                break;
+            }
+
+            start = nextStart;
         }
 
-        return List.copyOf(chunks);
+        return Collections.unmodifiableList(chunks);
+    }
+
+    private int findSentenceBoundary(
+            String text, int start, int end) {
+
+        int minimumEnd = start + (end - start) / 2;
+
+        for (int i = end - 1; i >= minimumEnd; i--) {
+            char current = text.charAt(i);
+
+            if (current == '.' || current == '!'
+                    || current == '?') {
+                int boundary = i + 1;
+
+                while (boundary < text.length()
+                        && Character.isWhitespace(
+                                text.charAt(boundary))) {
+                    boundary++;
+                }
+
+                if (boundary <= end) {
+                    return boundary;
+                }
+            }
+        }
+
+        return -1;
     }
 }
