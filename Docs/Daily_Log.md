@@ -323,3 +323,51 @@ Successfully implemented document-based semantic search using local embeddings. 
 - Improve text chunking to avoid splitting words and sentences unnecessarily.
 - Explore persistent storage for embeddings.
 - Integrate retrieved context with a language model to develop a complete RAG pipeline.
+## Day 13: Improve Text Chunking
+
+**Date:** 14 October 2026
+
+**Work Done:**
+- Improved `TextChunker.java` to prefer sentence boundaries when splitting text.
+- Added word-boundary handling to reduce incomplete words in chunks.
+- Preserved configurable chunk size and overlap.
+- Re-ran document-based semantic search using the existing `sample.txt`.
+- Verified that the RAG explanation is retrieved as the top result.
+
+**Testing:**
+- Loaded a document containing 1,314 characters.
+- Indexed 6 text chunks using local Ollama embeddings.
+- Tested the query: "How does RAG use retrieved documents to answer questions?"
+- Top result cosine distance: `0.2126`.
+
+**Outcome:**
+Improved text chunking and confirmed that document-based semantic search continues to work with the updated chunker.
+
+**Next Steps:**
+- Strengthen chunker tests for word boundaries, overlap, and long documents.
+- Implement persistent storage for vectors and document chunks.
+- Continue developing the local RAG pipeline.
+
+## Day 14: Persistent Vector Storage
+
+**Date:** 14 October 2026
+
+**Work Done:**
+- Implemented JSON-based persistence in `SemanticSearchService.java`.
+- Added functionality to save text passages and their embeddings to disk.
+- Added functionality to restore indexed vectors and original text from a saved JSON file.
+- Stored the index in `data/semantic-index.json`.
+- Updated the application to load saved data before performing semantic search.
+
+**Testing:**
+- Successfully created and saved the semantic index.
+- Restored 6 indexed passages from disk.
+- Verified that semantic search returned relevant results after loading the index.
+
+**Outcome:**
+Implemented basic persistent storage for the semantic search pipeline, reducing the need to regenerate document embeddings after every application restart.
+
+**Next Steps:**
+- Add automated persistence tests.
+- Improve index rebuilding and update handling.
+- Integrate retrieved document context with a local language model to build the RAG pipeline.

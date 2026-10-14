@@ -1,66 +1,71 @@
 
 package com.amamjain.yourownai;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
 public class App {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
+        Path indexPath = Path.of("data", "semantic-index.json");
 
-        // 1. Load the document
-        TextDocumentLoader loader = new TextDocumentLoader();
+        // Create an index only if one does not exist yet.
+        if (!java.nio.file.Files.exists(indexPath)) {
+            TextDocumentLoader loader =
+                    new TextDocumentLoader();
 
-        String document = loader.load(Path.of("sample.txt"));
+            String document =
+                    loader.load(Path.of("sample.txt"));
 
-        System.out.println("Document loaded successfully.");
-        System.out.println("Document characters: "
-                + document.length());
+            TextChunker chunker =
+                    new TextChunker(300, 50);
 
-        // 2. Split the document into chunks
-        TextChunker chunker = new TextChunker(300, 50);
-        List<String> chunks = chunker.chunkText(document);
+            List<String> chunks =
+                    chunker.chunkText(document);
 
-        System.out.println("Total chunks: " + chunks.size());
+            SemanticSearchService newIndex =
+                    new SemanticSearchService(
+                            new OllamaEmbeddingService());
 
-        // 3. Create the embedding and semantic search services
-        EmbeddingService embeddingService =
-                new OllamaEmbeddingService();
+            for (int i = 0; i < chunks.size(); i++) {
+                newIndex.addText(
+                        "chunk-" + (i + 1),
+                        chunks.get(i));
+            }
 
-        SemanticSearchService searchService =
-                new SemanticSearchService(embeddingService);
+            java.nio.file.Files.createDirectories(
+                    indexPath.getParent());
 
-        // 4. Generate embeddings and index every chunk
-        for (int i = 0; i < chunks.size(); i++) {
-            String id = "chunk-" + (i + 1);
-            searchService.addText(id, chunks.get(i));
+            newIndex.save(indexPath);
+
+            System.out.println("Created and saved index.");
         }
 
-        System.out.println("Indexed passages: "
-                + searchService.size());
+        // Load the saved vectors and text from disk.
+        SemanticSearchService searchService =
+                SemanticSearchService.load(
+                        indexPath,
+                        new OllamaEmbeddingService());
 
-        // 5. Search the document
+        System.out.println(
+                "Restored passages: " + searchService.size());
+
         String query =
                 "How does RAG use retrieved documents to answer questions?";
 
         System.out.println("\nQuery: " + query);
-        System.out.println("\nTop search results:");
 
         List<SearchResult> results =
                 searchService.search(query, 3);
 
-        // 6. Display the matching text
         for (SearchResult result : results) {
             String id = result.getVector().getId();
-            String originalText = searchService.getText(id);
 
             System.out.printf(
-                    "%nID: %s | Cosine distance: %.4f%n",
+                    "%nID: %s | Distance: %.4f%nText: %s%n",
                     id,
-                    result.getDistance());
-
-            System.out.println("Text: " + originalText);
+                    result.getDistance(),
+                    searchService.getText(id));
         }
     }
 }
