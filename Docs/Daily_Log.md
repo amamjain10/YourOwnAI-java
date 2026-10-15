@@ -371,3 +371,27 @@ Implemented basic persistent storage for the semantic search pipeline, reducing 
 - Add automated persistence tests.
 - Improve index rebuilding and update handling.
 - Integrate retrieved document context with a local language model to build the RAG pipeline.
+
+## Day 15: Persistence Testing and Index Reliability
+
+**Date:** 15 October 2026
+
+**Work Done:**
+- Added automated tests for `SemanticSearchService` persistence.
+- Tested saving and restoring document text and embeddings.
+- Verified that restored documents can still be searched.
+- Confirmed that loading a saved index does not regenerate document embeddings.
+- Added tests for duplicate document IDs and blank text validation.
+
+**Testing:**
+- Executed the Maven test suite.
+- Verified persistence using a temporary JSON index.
+- Tested semantic retrieval after restoring stored data.
+
+**Outcome:**
+Improved confidence in the persistence layer through automated tests and validation of restored search functionality.
+
+**Next Steps:**
+- Improve safe index updates and document re-indexing.
+- Integrate retrieved context with a local language model.
+- Develop the question-answering stage of the RAG pipeline.
