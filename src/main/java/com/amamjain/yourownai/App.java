@@ -1,8 +1,10 @@
 
 package com.amamjain.yourownai;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Scanner;
 
 public class App {
 
@@ -10,7 +12,7 @@ public class App {
         Path indexPath = Path.of("data", "semantic-index.json");
 
         // Create an index only if one does not exist yet.
-        if (!java.nio.file.Files.exists(indexPath)) {
+        if (!Files.exists(indexPath)) {
             TextDocumentLoader loader =
                     new TextDocumentLoader();
 
@@ -33,39 +35,58 @@ public class App {
                         chunks.get(i));
             }
 
-            java.nio.file.Files.createDirectories(
-                    indexPath.getParent());
-
+            Files.createDirectories(indexPath.getParent());
             newIndex.save(indexPath);
 
             System.out.println("Created and saved index.");
         }
 
-        // Load the saved vectors and text from disk.
+        // Restore saved passages and embeddings.
         SemanticSearchService searchService =
                 SemanticSearchService.load(
                         indexPath,
                         new OllamaEmbeddingService());
 
+        System.out.println("=== YourOwnAI-Java: RAG Demo ===");
         System.out.println(
                 "Restored passages: " + searchService.size());
 
-        String query =
-                "How does RAG use retrieved documents to answer questions?";
+        // Connect retrieval to answer generation.
+        RAGService ragService = new RAGService(
+                searchService,
+                new OllamaGenerationService());
 
-        System.out.println("\nQuery: " + query);
+        try (Scanner scanner = new Scanner(System.in)) {
+            while (true) {
+                System.out.print(
+                        "\nAsk a question (type 'exit' to quit): ");
 
-        List<SearchResult> results =
-                searchService.search(query, 3);
+                String question = scanner.nextLine().trim();
 
-        for (SearchResult result : results) {
-            String id = result.getVector().getId();
+                if (question.equalsIgnoreCase("exit")) {
+                    System.out.println("Goodbye!");
+                    break;
+                }
 
-            System.out.printf(
-                    "%nID: %s | Distance: %.4f%nText: %s%n",
-                    id,
-                    result.getDistance(),
-                    searchService.getText(id));
+                if (question.isBlank()) {
+                    System.out.println(
+                            "Please enter a non-empty question.");
+                    continue;
+                }
+
+                try {
+                    String answer =
+                            ragService.answerQuestion(question, 3);
+
+                    System.out.println("\n=== Generated Answer ===");
+                    System.out.println(answer);
+
+                } catch (RuntimeException e) {
+                    System.err.println(
+                            "Could not generate an answer: "
+                                    + e.getMessage());
+                }
+            }
         }
     }
 }
