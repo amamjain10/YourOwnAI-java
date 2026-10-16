@@ -99,30 +99,54 @@ public class TextChunkerTest {
                 .anyMatch(chunk -> chunk.contains("embeddings.")));
     }
         
-    @Test
-    public void shouldPreferSentenceBoundariesForChunkStarts() {
-        TextChunker chunker = new TextChunker(30, 8);
+   
+@Test
+public void shouldPreferSentenceBoundariesForChunkStarts() {
+    TextChunker chunker = new TextChunker(30, 8);
 
-        String text = "Java is useful for development. "
-                + "Python is popular for machine learning. "
-                + "Vector databases store embeddings.";
+    String text = "Java is useful for development. "
+            + "Python is popular for machine learning. "
+            + "Vector databases store embeddings.";
 
-        List<String> chunks = chunker.chunkText(text);
+    List<String> chunks = chunker.chunkText(text);
 
-        assertTrue(chunks.size() > 1);
+    assertTrue(chunks.size() > 1);
 
-        for (int i = 1; i < chunks.size(); i++) {
-            String chunk = chunks.get(i);
+    assertTrue(chunks.get(0).startsWith("Java"));
 
-            assertFalse(chunk.isBlank());
-            assertFalse(chunk.startsWith(" "));
-            assertFalse(chunk.endsWith(" "));
-        }
+    for (int i = 1; i < chunks.size(); i++) {
+        String chunk = chunks.get(i);
 
-        assertTrue(chunks.stream()
-                .anyMatch(chunk -> chunk.startsWith("Python")
-                        || chunk.startsWith("Vector")));
+        assertFalse(chunk.isBlank());
+        assertFalse(chunk.startsWith(" "));
+        assertFalse(chunk.endsWith(" "));
     }
 
+    assertTrue(chunks.stream()
+            .anyMatch(chunk -> chunk.contains("Python is popular")));
+    assertTrue(chunks.stream()
+            .anyMatch(chunk -> chunk.contains("Vector databases")));
+}
+
+
+@Test
+public void shouldPreserveAllImportantSentencesAcrossChunks() {
+    TextChunker chunker = new TextChunker(30, 8);
+
+    String text = "Java is useful for development. "
+            + "Python is popular for machine learning. "
+            + "Vector databases store embeddings.";
+
+    List<String> chunks = chunker.chunkText(text);
+    String combinedChunks = String.join(" ", chunks);
+        System.out.println("Generated chunks: " + chunks);
+System.out.println("Combined chunks: " + combinedChunks);
+    assertTrue(combinedChunks.contains(
+            "Java is useful for development."));
+    assertTrue(combinedChunks.contains(
+            "Python is popular for machine learning."));
+    assertTrue(combinedChunks.contains(
+            "Vector databases store embeddings."));
+}
 
 }

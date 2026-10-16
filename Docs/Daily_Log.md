@@ -470,3 +470,28 @@ Improved sentence-boundary handling and validated the updated chunker with autom
 - Further evaluate chunk overlap and retrieval relevance.
 - Consider additional tests for sentence boundaries and duplicate content.
 - Continue improving retrieval quality without breaking existing functionality.
+
+## Day 19 — Chunking and Retrieval Quality Evaluation (16 October 2026)
+
+### Work Completed
+- Replaced the earlier chunking logic with sentence-based chunking.
+- Improved chunk boundaries to preserve complete sentences when possible.
+- Added a regression test to verify that important sentences are preserved across chunks.
+- Regenerated the persistent semantic index using the updated chunker.
+- Evaluated retrieval quality using questions about RAG, cosine similarity, and supervised versus unsupervised learning.
+- Verified that generated answers display retrieved source passages, IDs, and cosine-distance scores.
+
+### Validation
+- Confirmed that the complete test suite passes: 50 tests.
+- Verified that the RAG question retrieves passages explaining RAG.
+- Verified that the cosine-similarity question retrieves passages explaining vector direction and cosine distance.
+- Verified that the supervised-versus-unsupervised question retrieves the direct explanation in the top-ranked passage.
+- Identified loosely related lower-ranked passages as an area for future improvement.
+
+### Outcome
+The application demonstrates relevant semantic retrieval and source-backed RAG answers across three sample questions. Sentence-based chunking preserves complete sentences in the tested cases, although overlap and retrieval precision may need further refinement.
+
+### Next Steps
+- Explore advanced vector-search algorithms.
+- Compare optimized search with the existing brute-force nearest-neighbor implementation.
+- Add benchmark tests to evaluate retrieval speed and result consistency.

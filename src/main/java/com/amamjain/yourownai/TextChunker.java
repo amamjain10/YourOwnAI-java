@@ -4,6 +4,8 @@ package com.amamjain.yourownai;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TextChunker {
 
@@ -30,145 +32,70 @@ public class TextChunker {
             return Collections.emptyList();
         }
 
+        List<String> sentences = splitSentences(text);
         List<String> chunks = new ArrayList<>();
-        int start = 0;
-        int length = text.length();
 
-        while (start < length) {
-            int end = Math.min(start + chunkSize, length);
+        StringBuilder current = new StringBuilder();
+        String previousSentence = "";
 
-            if (end < length) {
-                int preferredEnd = findSentenceBoundary(
-                        text, start, end);
-
-                if (preferredEnd > start) {
-                    end = preferredEnd;
-                } else {
-                    int whitespace = end;
-
-                    while (whitespace > start
-                            && !Character.isWhitespace(
-                                    text.charAt(whitespace - 1))) {
-                        whitespace--;
-                    }
-
-                    if (whitespace > start) {
-                        end = whitespace;
-                    } else {
-                        // A single word is longer than the chunk size.
-                        // Extend to the next word boundary rather than
-                        // splitting that word.
-                        while (end < length
-                                && !Character.isWhitespace(
-                                        text.charAt(end))) {
-                            end++;
-                        }
-                    }
-                }
+        for (String sentence : sentences) {
+            if (current.length() == 0) {
+                current.append(sentence);
+                continue;
             }
 
-            String chunk = text.substring(start, end).trim();
+            int combinedLength =
+                    current.length() + 1 + sentence.length();
 
-            if (!chunk.isEmpty()) {
-                chunks.add(chunk);
-            }
-
-            if (end >= length) {
-                break;
-            }
-            
-            int nextStart = Math.max(start + 1, end - overlap);
-
-            // Prefer a sentence boundary within the overlap region.
-            int sentenceStart = findNextSentenceStart(
-                    text, nextStart, end);
-
-            if (sentenceStart > nextStart) {
-                nextStart = sentenceStart;
+            if (combinedLength <= chunkSize) {
+                current.append(' ').append(sentence);
             } else {
-                // Fall back to a word boundary.
-                while (nextStart < end
-                        && !Character.isWhitespace(text.charAt(nextStart))) {
-                    nextStart++;
+                chunks.add(current.toString().trim());
+
+                // Repeat the previous sentence only when it fits
+                // within the configured overlap.
+                current.setLength(0);
+
+                if (!previousSentence.isEmpty()
+                        && previousSentence.length() <= overlap) {
+                    current.append(previousSentence).append(' ');
                 }
+
+                // Avoid creating a chunk that contains only overlap.
+                if (current.length() + sentence.length() > chunkSize
+                        && current.length() > 0) {
+                    current.setLength(0);
+                }
+
+                current.append(sentence);
             }
 
-            // int nextStart = Math.max(start + 1, end - overlap);
+            previousSentence = sentence;
+        }
 
-            // // Start the next chunk at a word boundary.
-            // while (nextStart < end
-            //         && !Character.isWhitespace(
-            //                 text.charAt(nextStart))) {
-            //     nextStart++;
-            // }
-
-            while (nextStart < length
-                    && Character.isWhitespace(
-                            text.charAt(nextStart))) {
-                nextStart++;
-            }
-
-            if (nextStart <= start || nextStart >= length) {
-                break;
-            }
-
-            start = nextStart;
+        if (current.length() > 0) {
+            chunks.add(current.toString().trim());
         }
 
         return Collections.unmodifiableList(chunks);
     }
-    
-        private int findNextSentenceStart(
-                String text, int start, int end) {
 
-            for (int i = start; i < end; i++) {
-                char current = text.charAt(i);
+    private List<String> splitSentences(String text) {
+        List<String> sentences = new ArrayList<>();
 
-                if (current == '.' || current == '!'
-                        || current == '?') {
+        Pattern pattern = Pattern.compile(
+                "[^.!?]+[.!?]+|[^.!?]+$");
 
-                    int boundary = i + 1;
+        Matcher matcher = pattern.matcher(text);
 
-                    while (boundary < text.length()
-                            && Character.isWhitespace(
-                                    text.charAt(boundary))) {
-                        boundary++;
-                    }
+        while (matcher.find()) {
+            String sentence = matcher.group().trim();
 
-                    if (boundary < text.length()
-                            && boundary <= end) {
-                        return boundary;
-                    }
-                }
-            }
-
-            return -1;
-        }
-
-    private int findSentenceBoundary(
-            String text, int start, int end) {
-
-        int minimumEnd = start + (end - start) / 2;
-
-        for (int i = end - 1; i >= minimumEnd; i--) {
-            char current = text.charAt(i);
-
-            if (current == '.' || current == '!'
-                    || current == '?') {
-                int boundary = i + 1;
-
-                while (boundary < text.length()
-                        && Character.isWhitespace(
-                                text.charAt(boundary))) {
-                    boundary++;
-                }
-
-                if (boundary <= end) {
-                    return boundary;
-                }
+            if (!sentence.isEmpty()) {
+                sentences.add(sentence);
             }
         }
 
-        return -1;
+        return sentences;
     }
 }
