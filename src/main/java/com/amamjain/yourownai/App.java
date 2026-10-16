@@ -13,6 +13,7 @@ public class App {
 
         // Create an index only if one does not exist yet.
         if (!Files.exists(indexPath)) {
+        // if(true){
             TextDocumentLoader loader =
                     new TextDocumentLoader();
 
@@ -24,6 +25,15 @@ public class App {
 
             List<String> chunks =
                     chunker.chunkText(document);
+                    System.out.println("\n=== Generated Text Chunks ===");
+
+                        for (int i = 0; i < chunks.size(); i++) {
+                        System.out.printf(
+                                "%nChunk %d (%d characters):%n%s%n",
+                                i + 1,
+                                chunks.get(i).length(),
+                                chunks.get(i));
+                        }
 
             SemanticSearchService newIndex =
                     new SemanticSearchService(

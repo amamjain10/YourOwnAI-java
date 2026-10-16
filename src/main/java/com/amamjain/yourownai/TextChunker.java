@@ -76,15 +76,31 @@ public class TextChunker {
             if (end >= length) {
                 break;
             }
-
+            
             int nextStart = Math.max(start + 1, end - overlap);
 
-            // Start the next chunk at a word boundary.
-            while (nextStart < end
-                    && !Character.isWhitespace(
-                            text.charAt(nextStart))) {
-                nextStart++;
+            // Prefer a sentence boundary within the overlap region.
+            int sentenceStart = findNextSentenceStart(
+                    text, nextStart, end);
+
+            if (sentenceStart > nextStart) {
+                nextStart = sentenceStart;
+            } else {
+                // Fall back to a word boundary.
+                while (nextStart < end
+                        && !Character.isWhitespace(text.charAt(nextStart))) {
+                    nextStart++;
+                }
             }
+
+            // int nextStart = Math.max(start + 1, end - overlap);
+
+            // // Start the next chunk at a word boundary.
+            // while (nextStart < end
+            //         && !Character.isWhitespace(
+            //                 text.charAt(nextStart))) {
+            //     nextStart++;
+            // }
 
             while (nextStart < length
                     && Character.isWhitespace(
@@ -101,6 +117,33 @@ public class TextChunker {
 
         return Collections.unmodifiableList(chunks);
     }
+    
+        private int findNextSentenceStart(
+                String text, int start, int end) {
+
+            for (int i = start; i < end; i++) {
+                char current = text.charAt(i);
+
+                if (current == '.' || current == '!'
+                        || current == '?') {
+
+                    int boundary = i + 1;
+
+                    while (boundary < text.length()
+                            && Character.isWhitespace(
+                                    text.charAt(boundary))) {
+                        boundary++;
+                    }
+
+                    if (boundary < text.length()
+                            && boundary <= end) {
+                        return boundary;
+                    }
+                }
+            }
+
+            return -1;
+        }
 
     private int findSentenceBoundary(
             String text, int start, int end) {

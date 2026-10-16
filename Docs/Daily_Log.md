@@ -442,3 +442,31 @@ The local RAG application now provides source transparency by showing which docu
 - Improve chunking and retrieval quality.
 - Add tests for source citations and response validation.
 - Explore more advanced vector indexing and benchmarking.
+
+## Day 18 — Sentence-Aware Text Chunking Improvements (16 October 2026)
+
+### Work Completed
+- Reviewed the existing `TextChunker.java` implementation and identified awkward chunk starts caused by overlap handling.
+- Improved chunk-start selection to prefer sentence boundaries within the overlap region.
+- Added tests for null input, unmodifiable results, word preservation, and sentence-aware chunk starts.
+- Regenerated the semantic index using the updated chunker.
+- Tested the local RAG pipeline with the question: "How does RAG use retrieved documents to answer questions?"
+
+### Validation
+- Maven test suite: 49 tests passed, with zero failures and errors.
+- Application successfully regenerated and saved the semantic index.
+- Confirmed that the RAG application generated a relevant answer and displayed three source passages.
+- Retrieved source distances were ordered from lowest to highest: 0.2848, 0.3410, and 0.5344.
+
+### Findings
+- Sentence-aware chunk starts reduced awkward fragments at the beginning of several chunks.
+- Some repeated text remains across chunk boundaries due to overlap.
+- Retrieved passages can contain additional information that is less relevant to the user's question.
+
+### Outcome
+Improved sentence-boundary handling and validated the updated chunker with automated tests and an end-to-end RAG query.
+
+### Next Steps
+- Further evaluate chunk overlap and retrieval relevance.
+- Consider additional tests for sentence boundaries and duplicate content.
+- Continue improving retrieval quality without breaking existing functionality.
