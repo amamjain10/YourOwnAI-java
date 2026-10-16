@@ -54,11 +54,17 @@ public class RAGServiceTest {
         RAGService ragService =
                 new RAGService(searchService, generator);
 
-        String answer = ragService.answerQuestion(
-                "Tell me about Java", 1);
+        RAGResponse response = ragService.answerQuestion(
+        "Tell me about Java", 1);
 
-        assertEquals(
-                "Java is a programming language.", answer);
+assertEquals(
+        "Java is a programming language.",
+        response.getAnswer());
+
+assertEquals(1, response.getSources().size());
+assertEquals(
+        "java-doc",
+        response.getSources().get(0).getId());
 
         assertNotNull(receivedPrompt.get());
         assertTrue(receivedPrompt.get().contains(
@@ -112,13 +118,15 @@ public class RAGServiceTest {
         };
 
         RAGService ragService =
-                new RAGService(emptySearchService, generator);
+        new RAGService(emptySearchService, generator);
 
-        String answer = ragService.answerQuestion(
-                "Tell me about Java", 3);
+RAGResponse response = ragService.answerQuestion(
+        "Tell me about Java", 3);
 
-        assertTrue(answer.contains(
-                "could not find relevant information"));
-        assertNull(receivedPrompt.get());
+assertTrue(response.getAnswer().contains(
+        "could not find relevant information"));
+
+assertTrue(response.getSources().isEmpty());
+assertNull(receivedPrompt.get());
     }
 }

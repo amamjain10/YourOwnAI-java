@@ -391,7 +391,54 @@ Implemented basic persistent storage for the semantic search pipeline, reducing 
 **Outcome:**
 Improved confidence in the persistence layer through automated tests and validation of restored search functionality.
 
-**Next Steps:**
+**Next Steps:** 
 - Improve safe index updates and document re-indexing.
 - Integrate retrieved context with a local language model.
 - Develop the question-answering stage of the RAG pipeline.
+
+## Day 16 — RAG Answer Generation and Testing (15 October 2026)
+
+### Work Completed
+- Integrated the local Qwen 2.5 3B model for answer generation using Ollama.
+- Implemented `OllamaGenerationService` to send prompts to the local generation API.
+- Introduced `TextGenerationService` to make answer generation replaceable and testable.
+- Implemented `RAGService` to retrieve relevant document passages and generate context-aware answers.
+- Updated `App.java` to support interactive question-and-answer sessions.
+- Added four unit tests covering answer generation, blank questions, invalid `topK`, and empty search results.
+
+### Validation
+- Verified relevant questions produce useful answers.
+- Tested an unsupported question about space travel; the model correctly indicated that the retrieved context lacked relevant information.
+- Ran `mvn clean test` successfully.
+- **Total tests: 45; Failures: 0; Errors: 0.**
+
+### Outcome
+The project now supports a complete local Retrieval-Augmented Generation workflow using semantic search, persistent embeddings, and local language-model generation.
+
+### Next Steps
+- Improve retrieval quality and document chunking.
+- Add source references to generated answers.
+- Explore answer quality evaluation and additional RAG tests.
+
+## Day 17 — RAG Source Citations (16 October 2026)
+
+### Work Completed
+- Created `RAGResponse.java` to represent a generated answer and its source citations.
+- Updated `RAGService.java` to return the answer together with the retrieved source passages.
+- Added source metadata including chunk ID, original passage text, and distance score.
+- Updated `App.java` to display generated answers and their retrieved sources.
+- Updated RAG unit tests for the new response structure.
+
+### Validation
+- Verified that the application generates an answer using retrieved context.
+- Confirmed that three retrieved passages were displayed with their IDs and distance scores.
+- Confirmed that the retrieved passages were ordered by ascending distance.
+- Existing test suite: 45 tests passed, with zero failures and errors after the response-model change.
+
+### Outcome
+The local RAG application now provides source transparency by showing which document passages were retrieved for a question.
+
+### Next Steps
+- Improve chunking and retrieval quality.
+- Add tests for source citations and response validation.
+- Explore more advanced vector indexing and benchmarking.

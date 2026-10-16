@@ -1,6 +1,7 @@
 
 package com.amamjain.yourownai;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RAGService {
@@ -26,7 +27,7 @@ public class RAGService {
         this.generationService = generationService;
     }
 
-    public String answerQuestion(String question, int topK) {
+    public RAGResponse answerQuestion(String question, int topK) {
         if (question == null || question.isBlank()) {
             throw new IllegalArgumentException(
                     "Question cannot be blank");
@@ -41,29 +42,40 @@ public class RAGService {
                 semanticSearchService.search(question, topK);
 
         if (results.isEmpty()) {
-            return "I could not find relevant information "
-                    + "to answer this question.";
+            return new RAGResponse(
+                    "I could not find relevant information "
+                            + "to answer this question.",
+                    List.of());
         }
 
         StringBuilder context = new StringBuilder();
+        List<RAGResponse.SourceCitation> citations =
+                new ArrayList<>();
 
         for (SearchResult result : results) {
             String id = result.getVector().getId();
-
             String text = semanticSearchService.getText(id);
 
-                if (text != null && !text.isBlank()) {
-                    context.append("[Passage: ")
-                            .append(id)
-                            .append("]\n")
-                            .append(text)
-                            .append("\n\n");
-                }
+            if (text != null && !text.isBlank()) {
+                context.append("[Passage: ")
+                        .append(id)
+                        .append("]\n")
+                        .append(text)
+                        .append("\n\n");
+
+                citations.add(
+                        new RAGResponse.SourceCitation(
+                                id,
+                                text,
+                                result.getDistance()));
+            }
         }
 
         if (context.isEmpty()) {
-            return "I could not retrieve document text "
-                    + "to answer this question.";
+            return new RAGResponse(
+                    "I could not retrieve document text "
+                            + "to answer this question.",
+                    List.of());
         }
 
         String prompt = """
@@ -86,6 +98,8 @@ public class RAGService {
                 Answer:
                 """.formatted(context, question);
 
-        return generationService.generate(prompt);
+        String answer = generationService.generate(prompt);
+
+        return new RAGResponse(answer, citations);
     }
 }

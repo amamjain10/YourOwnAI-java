@@ -75,11 +75,27 @@ public class App {
                 }
 
                 try {
-                    String answer =
-                            ragService.answerQuestion(question, 3);
+                    RAGResponse response =
+        ragService.answerQuestion(question, 3);
 
-                    System.out.println("\n=== Generated Answer ===");
-                    System.out.println(answer);
+System.out.println("\n=== Generated Answer ===");
+System.out.println(response.getAnswer());
+
+System.out.println("\n=== Sources ===");
+
+if (response.getSources().isEmpty()) {
+    System.out.println("No source passages were retrieved.");
+} else {
+    for (RAGResponse.SourceCitation source
+            : response.getSources()) {
+
+        System.out.printf(
+                "%nSource: %s | Distance: %.4f%nText: %s%n",
+                source.getId(),
+                source.getDistance(),
+                source.getText());
+    }
+}
 
                 } catch (RuntimeException e) {
                     System.err.println(
