@@ -21,31 +21,39 @@ A Java-based vector database and Retrieval-Augmented Generation (RAG) engine bui
 
 ## Project Progress
 
-- [x] Initialize the Maven project.
-- [x] Implement the immutable `Vector` model.
-- [x] Add vector validation and immutability tests.
-- [x] Implement the in-memory `VectorStore`.
-- [x] Add unit tests for `VectorStore`.
 - [x] Implement Euclidean distance.
 - [x] Implement Manhattan distance.
 - [x] Implement cosine similarity.
-- [x] Add unit tests for vector distance metrics.
-- [ ] Implement brute-force nearest-neighbor search.
-- [ ] Support top-K search results.
+- [x] Build brute-force nearest-neighbor search.
+- [x] Support top-K search results.
+- [x] Support selectable search metrics.
 - [ ] Implement approximate nearest-neighbor search.
 - [ ] Integrate local embeddings using Ollama.
 - [ ] Build the RAG pipeline.
-- [ ] Benchmark search performance and retrieval quality.
 
 > **Note:** Mark the nearest-neighbor tasks as completed after the implementation and tests pass.
 
 ## Running Tests
 
-Run the following command from the project root:
+
+## Running the Demo
+
+Run the unit tests:
 
 ```bash
 mvn clean test
 ```
+
+Build the project and run the vector search demo:
+
+```bash
+mvn -q package
+java -cp target/classes com.amamjain.yourownai.App
+```
+
+The demo creates sample vectors and performs top-K searches
+using Euclidean distance, Manhattan distance, and cosine similarity.
+
 
 ## Project Structure
 

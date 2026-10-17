@@ -94,4 +94,73 @@ public class NearestNeighborSearchTest {
             // Expected result.
         }
     }
+                
+    @Test
+    public void testSearchWithManhattanDistance() {
+        VectorStore store = new VectorStore();
+        store.add(new Vector("A", new double[]{1, 1}));
+        store.add(new Vector("B", new double[]{3, 3}));
+
+        NearestNeighborSearch search =
+            new NearestNeighborSearch(store);
+
+        List<SearchResult> results = search.search(
+            new Vector("query", new double[]{0, 0}),
+            2,
+            SearchMetric.MANHATTAN
+        );
+
+        assertEquals("A", results.get(0).getVector().getId());
+        assertEquals(2.0, results.get(0).getDistance(), 1e-9);
+    }
+
+    @Test
+    public void testSearchWithCosineSimilarity() {
+        VectorStore store = new VectorStore();
+        store.add(new Vector("same-direction", new double[]{2, 0}));
+        store.add(new Vector("diagonal", new double[]{1, 1}));
+        store.add(new Vector("perpendicular", new double[]{0, 1}));
+
+        NearestNeighborSearch search =
+            new NearestNeighborSearch(store);
+
+        List<SearchResult> results = search.search(
+            new Vector("query", new double[]{1, 0}),
+            3,
+            SearchMetric.COSINE
+        );
+
+        assertEquals(
+            "same-direction",
+            results.get(0).getVector().getId()
+        );
+        assertEquals(
+            "diagonal",
+            results.get(1).getVector().getId()
+        );
+        assertEquals(
+            "perpendicular",
+            results.get(2).getVector().getId()
+        );
+
+        assertEquals(0.0, results.get(0).getDistance(), 1e-9);
+    }
+
+    @Test
+    public void testNullMetricIsRejected() {
+        NearestNeighborSearch search =
+            new NearestNeighborSearch(new VectorStore());
+
+        try {
+            search.search(
+                new Vector("query", new double[]{1, 2}),
+                1,
+                null
+            );
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException expected) {
+            // Expected result.
+        }
+    }
+
 }

@@ -495,3 +495,28 @@ The application demonstrates relevant semantic retrieval and source-backed RAG a
 - Explore advanced vector-search algorithms.
 - Compare optimized search with the existing brute-force nearest-neighbor implementation.
 - Add benchmark tests to evaluate retrieval speed and result consistency.
+
+## Day 20 — Heap-Based Top-K Search Optimization (17 October 2026)
+
+### Work Completed
+- Reviewed the existing brute-force nearest-neighbor search implementation.
+- Created `SearchBenchmark.java` to measure search time with 100, 1,000, and 5,000 vectors, using 128 dimensions and top K = 3.
+- Recorded the original baseline search times.
+- Replaced full-result sorting with a priority queue that retains only the best K candidates.
+- Preserved support for Euclidean, Manhattan, and cosine distance.
+- Preserved deterministic ordering by distance and vector ID.
+
+### Validation
+- Confirmed that all 54 tests passed after the heap optimization.
+- Ran the benchmark multiple times to observe timing variation.
+- The original baseline measured 0.398 ms, 1.574 ms, and 8.639 ms for 100, 1,000, and 5,000 vectors, respectively.
+- The median of three optimized runs measured 0.409 ms, 2.060 ms, and 4.878 ms for the same dataset sizes.
+- Observed promising performance at 5,000 vectors, while smaller datasets did not show consistent improvements.
+
+### Outcome
+Implemented heap-based top-K selection, reducing the number of results that need to be sorted. Preliminary benchmark results suggest this approach may benefit larger datasets, but further controlled benchmarking is needed for a reliable comparison.
+
+### Next Steps
+- Improve benchmark reliability and compare both implementations under equivalent conditions.
+- Explore advanced nearest-neighbor indexing, including KD-tree and HNSW approaches.
+- Continue testing correctness and performance as the dataset grows.

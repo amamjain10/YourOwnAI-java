@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.PriorityQueue;
 
 public class NearestNeighborSearch {
 
@@ -25,30 +26,44 @@ public class NearestNeighborSearch {
             Vector query, int k, SearchMetric metric) {
 
         Objects.requireNonNull(query, "Query vector cannot be null");
-        Objects.requireNonNull(metric, "Search metric cannot be null");
+
+        if (metric == null) {
+            throw new IllegalArgumentException(
+                    "Search metric cannot be null");
+        }
 
         if (k <= 0) {
             throw new IllegalArgumentException(
                     "k must be greater than zero");
         }
 
-        List<SearchResult> results = new ArrayList<>();
+        Comparator<SearchResult> bestFirst =
+                Comparator.comparingDouble(SearchResult::getDistance)
+                        .thenComparing(
+                                result -> result.getVector().getId());
+
+        // The worst result among the retained candidates stays at the head.
+        PriorityQueue<SearchResult> topResults =
+                new PriorityQueue<>(bestFirst.reversed());
 
         for (Vector candidate : vectorStore.getAll()) {
             double score;
 
             switch (metric) {
                 case EUCLIDEAN:
-                    score = VectorMetrics.euclideanDistance(query, candidate);
+                    score = VectorMetrics.euclideanDistance(
+                            query, candidate);
                     break;
 
                 case MANHATTAN:
-                    score = VectorMetrics.manhattanDistance(query, candidate);
+                    score = VectorMetrics.manhattanDistance(
+                            query, candidate);
                     break;
 
                 case COSINE:
                     score = 1.0
-                            - VectorMetrics.cosineSimilarity(query, candidate);
+                            - VectorMetrics.cosineSimilarity(
+                                    query, candidate);
                     break;
 
                 default:
@@ -56,15 +71,20 @@ public class NearestNeighborSearch {
                             "Unsupported search metric: " + metric);
             }
 
-            results.add(new SearchResult(candidate, score));
+            SearchResult result = new SearchResult(candidate, score);
+
+            if (topResults.size() < k) {
+                topResults.offer(result);
+            } else if (bestFirst.compare(
+                    result, topResults.peek()) < 0) {
+                topResults.poll();
+                topResults.offer(result);
+            }
         }
 
-        results.sort(
-                Comparator.comparingDouble(SearchResult::getDistance)
-                        .thenComparing(result -> result.getVector().getId())
-        );
+        List<SearchResult> results = new ArrayList<>(topResults);
+        results.sort(bestFirst);
 
-        return List.copyOf(
-                results.subList(0, Math.min(k, results.size())));
+        return List.copyOf(results);
     }
 }
