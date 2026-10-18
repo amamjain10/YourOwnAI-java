@@ -520,3 +520,29 @@ Implemented heap-based top-K selection, reducing the number of results that need
 - Improve benchmark reliability and compare both implementations under equivalent conditions.
 - Explore advanced nearest-neighbor indexing, including KD-tree and HNSW approaches.
 - Continue testing correctness and performance as the dataset grows.
+
+## Day 22 — HNSW Graph Construction and Insertion (18 October 2026)
+
+### Work Completed
+- Created `HnswIndex.java` to establish the foundation for a Hierarchical Navigable Small World (HNSW) index.
+- Implemented graph nodes containing vectors, assigned levels, and per-layer neighbor lists.
+- Added configurable maximum-neighbor limits and deterministic random-level assignment using a seed.
+- Implemented vector insertion with connections to nearby existing nodes.
+- Added neighbor pruning to enforce the configured connection limit.
+- Created `HnswIndexTest.java` to validate insertion, empty-index behavior, duplicate-ID rejection, dimension validation, and deterministic level assignment.
+- Added tests to verify neighbor connections and maximum-neighbor limits.
+
+### Validation
+- Confirmed that all 69 tests passed.
+- Verified that inserted nodes receive neighbor connections at layer 0.
+- Verified that the layer-0 neighbor count does not exceed the configured maximum.
+- Confirmed that the existing project tests continue to pass.
+
+### Outcome
+Established and tested an initial layered graph structure for HNSW. The current implementation uses simplified neighbor selection and is not yet a complete standard HNSW implementation.
+
+### Next Steps
+- Implement graph-guided nearest-neighbor search.
+- Compare HNSW search results against brute-force search.
+- Measure search latency and Recall@3.
+- Improve neighbor selection and graph construction as needed.
