@@ -546,3 +546,35 @@ Established and tested an initial layered graph structure for HNSW. The current 
 - Compare HNSW search results against brute-force search.
 - Measure search latency and Recall@3.
 - Improve neighbor selection and graph construction as needed.
+
+## Day 23 — HNSW Search and Benchmarking (18 October 2026)
+
+### Work Completed
+- Implemented approximate nearest-neighbor search in `HnswIndex.java`.
+- Added greedy navigation through upper graph layers and candidate exploration at layer 0.
+- Added tests for nearest-neighbor retrieval, distance ordering, empty-index behavior, and query-dimension validation.
+- Added a Recall@3 test comparing HNSW results against brute-force search.
+- Created `HnswBenchmark.java` to compare brute-force, KD-tree, and HNSW search using 128-dimensional synthetic vectors.
+- Measured index construction time, average query latency, and Recall@3 for datasets containing 100, 1,000, and 5,000 vectors.
+
+### Validation
+- Confirmed that all 74 tests passed.
+- The initial small-dataset Recall@3 test reported 100% recall.
+- Benchmark results:
+
+| Dataset Size | Brute Force (ms/query) | KD-tree (ms/query) | HNSW (ms/query) | HNSW Recall@3 |
+|---:|---:|---:|---:|---:|
+| 100 | 0.0454 | 0.0596 | 0.4339 | 95.33% |
+| 1,000 | 0.3272 | 0.5549 | 0.4096 | 64.33% |
+| 5,000 | 1.7621 | 2.7658 | 0.4834 | 32.33% |
+
+- HNSW construction times were approximately 83 ms, 2.93 seconds, and 94.74 seconds for the three dataset sizes, respectively.
+- Observed that HNSW had lower query latency than brute force at 5,000 vectors, but its recall decreased substantially as the dataset grew.
+
+### Outcome
+Implemented and tested an initial HNSW search implementation and benchmarked it against exact brute-force search and KD-tree search. The experiments exposed limitations in graph construction time and retrieval recall. The implementation remains experimental and is not claimed to be production-ready.
+
+### Next Steps
+- Keep the custom HNSW implementation as a learning and comparison component.
+- Build a Spring Boot REST API around the existing vector-search and RAG services.
+- Document the architecture, benchmarks, and implementation limitations in the project README.

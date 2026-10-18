@@ -1,6 +1,8 @@
 
 package com.amamjain.yourownai;
 
+import java.util.Comparator;
+import java.util.PriorityQueue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -161,6 +163,162 @@ public class HnswIndex {
         }
 
         return node.neighbors.get(layer).size();
+    }
+    
+    /**
+     * Searches the graph for approximate nearest neighbors.
+     *
+     * @param query query vector
+     * @param k maximum number of results
+     * @param efSearch size of the candidate search pool
+     * @return nearest results ordered by Euclidean distance
+     */
+    public List<SearchResult> search(
+            Vector query, int k, int efSearch) {
+
+        Objects.requireNonNull(query, "Query cannot be null");
+
+        if (k <= 0) {
+            throw new IllegalArgumentException(
+                    "k must be greater than zero");
+        }
+
+        if (efSearch <= 0) {
+            throw new IllegalArgumentException(
+                    "efSearch must be greater than zero");
+        }
+
+        if (entryPoint == null) {
+            return List.of();
+        }
+
+        if (query.dimension() != dimensions) {
+            throw new IllegalArgumentException(
+                    "Query dimension must match indexed vectors");
+        }
+
+        Node current = entryPoint;
+
+        // Navigate from the highest layer down to layer 1.
+        for (int layer = maxLevel; layer >= 1; layer--) {
+            current = greedySearch(query, current, layer);
+        }
+
+        // Explore a wider set of candidates at layer 0.
+        List<SearchResult> candidates =
+                searchLayerZero(query, current, Math.max(k, efSearch));
+
+        int resultCount = Math.min(k, candidates.size());
+
+        return List.copyOf(candidates.subList(0, resultCount));
+    }
+
+    private Node greedySearch(
+            Vector query, Node current, int layer) {
+
+        boolean improved;
+
+        do {
+            improved = false;
+
+            Node best = current;
+            double bestDistance =
+                    VectorMetrics.euclideanDistance(
+                            query, current.vector);
+
+            for (Node neighbor : current.neighbors.get(layer)) {
+                double distance =
+                        VectorMetrics.euclideanDistance(
+                                query, neighbor.vector);
+
+                if (distance < bestDistance
+                        || (distance == bestDistance
+                        && neighbor.vector.getId().compareTo(
+                                best.vector.getId()) < 0)) {
+                    best = neighbor;
+                    bestDistance = distance;
+                    improved = true;
+                }
+            }
+
+            current = best;
+        } while (improved);
+
+        return current;
+    }
+
+    private List<SearchResult> searchLayerZero(
+            Vector query, Node start, int ef) {
+
+        Comparator<SearchResult> bestFirst =
+                Comparator.comparingDouble(SearchResult::getDistance)
+                        .thenComparing(
+                                result -> result.getVector().getId());
+
+        PriorityQueue<Node> candidates = new PriorityQueue<>(
+                Comparator.comparingDouble(
+                        node -> VectorMetrics.euclideanDistance(
+                                query, node.vector)));
+
+        PriorityQueue<SearchResult> bestResults =
+                new PriorityQueue<>(bestFirst.reversed());
+
+        java.util.Set<String> visited =
+                new java.util.HashSet<>();
+
+        candidates.offer(start);
+        visited.add(start.vector.getId());
+
+        SearchResult initial = new SearchResult(
+                start.vector,
+                VectorMetrics.euclideanDistance(query, start.vector));
+
+        bestResults.offer(initial);
+
+        while (!candidates.isEmpty()) {
+            Node candidate = candidates.poll();
+
+            double candidateDistance =
+                    VectorMetrics.euclideanDistance(
+                            query, candidate.vector);
+
+            SearchResult worst = bestResults.peek();
+
+            if (bestResults.size() >= ef
+                    && candidateDistance > worst.getDistance()) {
+                break;
+            }
+
+            for (Node neighbor : candidate.neighbors.get(0)) {
+                if (!visited.add(neighbor.vector.getId())) {
+                    continue;
+                }
+
+                double distance =
+                        VectorMetrics.euclideanDistance(
+                                query, neighbor.vector);
+
+                if (bestResults.size() < ef
+                        || distance < bestResults.peek().getDistance()) {
+
+                    candidates.offer(neighbor);
+
+                    bestResults.offer(
+                            new SearchResult(neighbor.vector, distance));
+
+                    if (bestResults.size() > ef) {
+                        bestResults.poll();
+                    }
+                }
+            }
+        }
+
+        List<SearchResult> results =
+                new ArrayList<>(bestResults);
+
+        results.sort(bestFirst);
+
+        return results;
     }
 
 }
