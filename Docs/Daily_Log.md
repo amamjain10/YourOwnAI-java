@@ -578,3 +578,27 @@ Implemented and tested an initial HNSW search implementation and benchmarked it 
 - Keep the custom HNSW implementation as a learning and comparison component.
 - Build a Spring Boot REST API around the existing vector-search and RAG services.
 - Document the architecture, benchmarks, and implementation limitations in the project README.
+
+## Day 24 — Spring Boot REST API Setup (19 October 2026)
+
+### Work Completed
+- Added Spring Boot dependencies to the existing Maven project.
+- Created `YourOwnAiApplication.java` as the Spring Boot application entry point.
+- Implemented `HealthController.java` to expose a REST endpoint.
+- Created `GET /api/health`, returning application status as JSON.
+- Preserved the existing vector search, semantic retrieval, and RAG implementation.
+
+### Validation
+- Ran `mvn clean test` successfully.
+- Confirmed all 74 existing tests passed.
+- Started the Spring Boot application locally.
+- Verified the health endpoint at `http://localhost:8080/api/health`.
+
+### Outcome
+Established the foundation for exposing YourOwnAI-Java functionality through HTTP endpoints.
+
+### Next Steps
+- Add a REST endpoint for semantic search.
+- Add a REST endpoint for RAG question answering.
+- Test API requests and responses.
+- Prepare the application for frontend integration and deployment.
