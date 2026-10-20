@@ -32,4 +32,19 @@ public class SearchConfig {
         return SemanticSearchService.load(
                 indexPath, embeddingService);
     }
+    
+    @Bean
+    public TextGenerationService textGenerationService() {
+        return new OllamaGenerationService();
+    }
+
+    @Bean
+    public RAGService ragService(
+            SemanticSearchService semanticSearchService,
+            TextGenerationService textGenerationService) {
+        return new RAGService(
+                semanticSearchService,
+                textGenerationService);
+    }
+
 }
