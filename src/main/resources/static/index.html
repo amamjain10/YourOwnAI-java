@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#171b2e">
+    <title>YourOwnAI — Knowledge Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="#" aria-label="YourOwnAI home">
+            <div class="brand-icon">✳</div>
+            <div>
+                <h1>YourOwnAI</h1>
+                <p>Your personal knowledge assistant</p>
+            </div>
+        </a>
+
+        <nav class="top-nav" aria-label="Main navigation">
+            <button class="nav-top active" data-page="chat">⌂ Home</button>
+            <button class="nav-top" data-page="documents">▤ Documents</button>
+            <button class="nav-top" data-page="settings">⚙ Settings</button>
+        </nav>
+
+        <div class="connection">
+            <span class="status-dot"></span>
+            <span>Local AI (Ollama)</span>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <nav class="side-nav" aria-label="Sidebar navigation">
+                <button class="side-link active" data-page="chat">
+                    <span class="side-icon">▤</span>
+                    <span><strong>Chat</strong><small>Ask your documents</small></span>
+                </button>
+                <button class="side-link" data-page="documents">
+                    <span class="side-icon">▧</span>
+                    <span><strong>Documents</strong><small>Upload and manage files</small></span>
+                </button>
+                <button class="side-link" data-page="knowledge">
+                    <span class="side-icon">◉</span>
+                    <span><strong>Knowledge Base</strong><small>Explore indexed content</small></span>
+                </button>
+                <button class="side-link" data-page="settings">
+                    <span class="side-icon">⚙</span>
+                    <span><strong>Settings</strong><small>Models and preferences</small></span>
+                </button>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="ollama-mark"><span class="status-dot"></span> Ollama connection</div>
+                <p>Local model · Private workspace</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section class="hero panel">
+                <div class="eyebrow">YOUR PERSONAL AI WORKSPACE</div>
+                <h2>Chat with <span>your documents</span></h2>
+                <p>Upload your knowledge, ask questions, and get answers grounded in your content.</p>
+
+                <div class="feature-row">
+                    <div class="feature">
+                        <div class="feature-icon">⇧</div>
+                        <div><strong>Upload documents</strong><small>PDF and TXT files</small></div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">⌕</div>
+                        <div><strong>Smart answers</strong><small>Powered by RAG</small></div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">▱</div>
+                        <div><strong>Trusted sources</strong><small>Relevant passages</small></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-view" id="chat-page">
+                <section class="upload-panel panel">
+                    <div class="section-heading">
+                        <div>
+                            <h3>Add to your knowledge base</h3>
+                            <p>Start by selecting a document from your computer.</p>
+                        </div>
+                        <button class="button button-secondary" id="browse-button">＋ Add document</button>
+                    </div>
+
+                    <label class="drop-zone" id="drop-zone" for="file-input">
+                        <input type="file" id="file-input" accept=".pdf,.txt,text/plain,application/pdf" hidden>
+                        <div class="upload-icon">⇧</div>
+                        <div>
+                            <strong>Drop your documents here</strong>
+                            <p>or <span>browse files</span> to upload</p>
+                            <small>PDF or TXT · Maximum 50 MB per file (UI limit; server validation will be added)</small>
+                        </div>
+                    </label>
+                    <p class="upload-status" id="upload-status" role="status">Document upload will be connected in the next step.</p>
+                </section>
+
+                <section class="chat-panel panel">
+                    <div class="section-heading chat-heading">
+                        <div>
+                            <h3>Ask your knowledge base</h3>
+                            <p>Answers are generated using your indexed documents.</p>
+                        </div>
+                        <span class="pill"><span class="status-dot"></span> RAG assistant</span>
+                    </div>
+
+                    <div class="chat-messages" id="chat">
+                        <div class="message assistant-message">
+                            <div class="avatar ai-avatar">✳</div>
+                            <div class="message-content">
+                                <strong>Your AI assistant</strong>
+                                <p>Hello! Ask me a question about your indexed documents. I'll retrieve relevant passages and use them to help answer.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="suggestions">
+                        <span>Try asking</span>
+                        <button class="suggestion" data-question="What is a vector database?">What is a vector database?</button>
+                        <button class="suggestion" data-question="Explain retrieval-augmented generation.">Explain RAG</button>
+                    </div>
+
+                    <form id="question-form" class="composer">
+                        <textarea id="question" rows="1" placeholder="Ask a question about your documents..." required></textarea>
+                        <button class="send-button" id="send-button" type="submit" aria-label="Send question">➤</button>
+                    </form>
+                    <p class="composer-note" id="status" role="status">Ready when you are · AI responses may need verification</p>
+                </section>
+            </section>
+
+            <section class="page-view hidden" id="documents-page">
+                <section class="panel page-panel">
+                    <div class="section-heading">
+                        <div><h3>Your documents</h3><p>Manage the files you want your AI to understand.</p></div>
+                        <button class="button" id="documents-upload-button">＋ Add document</button>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-icon">▤</div>
+                        <h3>Your document library</h3>
+                        <p>Uploaded documents will appear here once document management is connected to the backend.</p>
+                        <button class="button button-secondary" id="empty-browse-button">Choose a document</button>
+                    </div>
+                </section>
+            </section>
+
+            <section class="page-view hidden" id="knowledge-page">
+                <section class="panel page-panel">
+                    <h3>Knowledge base</h3>
+                    <p class="muted">Your searchable document chunks and embeddings will be shown here.</p>
+                    <div class="info-card"><strong>Semantic search</strong><p>Your existing vector search service remains the foundation of this feature.</p></div>
+                </section>
+            </section>
+
+            <section class="page-view hidden" id="settings-page">
+                <section class="panel page-panel">
+                    <h3>Settings</h3>
+                    <p class="muted">Local model and application status.</p>
+                    <div class="settings-row"><span>Embedding model</span><strong>nomic-embed-text</strong></div>
+                    <div class="settings-row"><span>Generation model</span><strong>qwen2.5:3b</strong></div>
+                    <div class="settings-row"><span>Backend</span><strong>Spring Boot · Port 8080</strong></div>
+                    <p class="muted">Model names reflect the current project configuration; connection status will be verified separately.</p>
+                </section>
+            </section>
+        </main>
+
+        <aside class="right-panel">
+            <section class="panel right-card">
+                <div class="section-heading compact-heading">
+                    <div><h3>Documents</h3><p id="document-count">Your knowledge library</p></div>
+                    <button class="icon-button" id="right-upload-button" aria-label="Add document">＋</button>
+                </div>
+                <div class="document-placeholder">
+                    <div class="file-icon pdf-icon">PDF</div>
+                    <div class="file-details"><strong>Your PDF files</strong><small>Appear after upload is connected</small></div>
+                </div>
+                <div class="document-placeholder">
+                    <div class="file-icon txt-icon">TXT</div>
+                    <div class="file-details"><strong>Your text files</strong><small>Appear after upload is connected</small></div>
+                </div>
+            </section>
+
+            <section class="panel right-card">
+                <h3>Example questions</h3>
+                <div class="example-list">
+                    <button data-question="Summarize my uploaded documents.">Summarize my documents</button>
+                    <button data-question="Explain the architecture of RAG.">Explain the architecture of RAG</button>
+                    <button data-question="What are the key concepts in my notes?">Find key concepts in my notes</button>
+                </div>
+            </section>
+
+            <section class="panel right-card">
+                <div class="section-heading compact-heading">
+                    <h3>System status</h3>
+                    <span class="status-label"><span class="status-dot"></span> Local setup</span>
+                </div>
+                <div class="settings-row"><span>Backend API</span><strong>Port 8080</strong></div>
+                <div class="settings-row"><span>Embeddings</span><strong>Ollama</strong></div>
+                <div class="settings-row"><span>Vector search</span><strong>Cosine similarity</strong></div>
+                <p class="muted tiny">Live health checks will be added separately.</p>
+            </section>
+        </aside>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

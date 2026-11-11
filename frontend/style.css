@@ -1,0 +1,186 @@
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    color: #e8edf7;
+    background: #0b1020;
+}
+
+body {
+    min-height: 100vh;
+    padding: 24px;
+    background:
+        radial-gradient(ellipse at top, #192747 0%, #0b1020 55%);
+}
+
+.app {
+    width: 100%;
+    max-width: 850px;
+    min-height: calc(100vh - 48px);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 0 28px;
+    border-bottom: 1px solid #263149;
+}
+
+.logo {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #7c6cff, #42c6d9);
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.header h1 {
+    font-size: 22px;
+    letter-spacing: -0.5px;
+}
+
+.header p {
+    margin-top: 4px;
+    color: #9caac2;
+    font-size: 13px;
+}
+
+.welcome {
+    padding: 36px 0 24px;
+}
+
+.welcome h2 {
+    font-size: clamp(24px, 5vw, 34px);
+    letter-spacing: -1px;
+}
+
+.welcome p {
+    margin-top: 10px;
+    color: #a8b4ca;
+    line-height: 1.6;
+}
+
+.chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 8px 0 24px;
+}
+
+.message {
+    max-width: 90%;
+    padding: 16px 18px;
+    border: 1px solid #293650;
+    border-radius: 16px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.assistant {
+    align-self: flex-start;
+    background: #151e32;
+}
+
+.user {
+    align-self: flex-end;
+    background: #34336a;
+    border-color: #504ca1;
+}
+
+.question-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #35425b;
+    border-radius: 18px;
+    background: #11192b;
+}
+
+.question-form textarea {
+    flex: 1;
+    min-width: 0;
+    resize: vertical;
+    max-height: 180px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #ffffff;
+    font: inherit;
+    line-height: 1.5;
+    padding: 8px;
+}
+
+.question-form textarea::placeholder {
+    color: #8391aa;
+}
+
+.question-form button {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 20px;
+    background: #7167f8;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.question-form button:hover {
+    background: #8a82ff;
+}
+
+.question-form button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.status {
+    min-height: 36px;
+    padding: 12px 4px;
+    color: #9caac2;
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 14px;
+    }
+
+    .app {
+        min-height: calc(100vh - 28px);
+    }
+
+    .welcome {
+        padding-top: 28px;
+    }
+
+    .message {
+        max-width: 96%;
+    }
+
+    .question-form {
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .question-form button {
+        padding: 12px 14px;
+    }
+}

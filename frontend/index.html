@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YourOwnAI — Knowledge Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="app">
+        <header class="header">
+            <div class="logo">Y</div>
+            <div>
+                <h1>YourOwnAI</h1>
+                <p>Your personal knowledge assistant</p>
+            </div>
+        </header>
+
+        <section class="welcome">
+            <h2>Ask your knowledge base</h2>
+            <p>Ask a question and get an answer grounded in retrieved passages.</p>
+        </section>
+
+        <section id="chat" class="chat" aria-live="polite">
+            <div class="message assistant">
+                Hello! Ask me a question about your indexed documents.
+            </div>
+        </section>
+
+        <form id="question-form" class="question-form">
+            <textarea
+                id="question"
+                placeholder="Ask a question..."
+                rows="2"
+                required
+            ></textarea>
+            <button id="send-button" type="submit">Ask</button>
+        </form>
+
+        <p id="status" class="status">Ready</p>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
